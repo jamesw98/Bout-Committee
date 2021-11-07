@@ -82,3 +82,64 @@ function update_fencer_value(fencer_id, key, value) {
         return `Successfully updated ${key} to ${value}`
     }
 }
+
+/**
+ * creates a tournament and puts it in the Tournaments table
+ * @param {*} name the name of the tournament 
+ * @param {*} location the location of the tournament (venue name)
+ * @param {*} address1 the address of the tournament 
+ * @param {*} city the city the tournament takes place in
+ * @param {*} state the state the tournament takes place in
+ * @param {*} zip the zip code the tournament takes place in
+ * @param {*} year the year the tournament takes place
+ * @param {*} address2 (OPTIONAL) the second line of the address for the tournament (suite, room #, etc)
+ * @returns a result string
+ */
+function create_tournament(name, location, address1, city, state, zip, year, address2="") {
+    if (check_if_tournament_exists(name, year)) {
+        return `Tournament ${name} already exists for this year, please change the name.`
+    }
+
+    let sql = ''
+    if (address2) {
+        sql = `
+            INSERT INTO 
+                Tournaments(TournamentName, Location, Address1, Address2, City, State, Zip, Year)
+            Values
+                ('${name}', '${location}', ${address1}, '${address2}', '${city}', '${state}}', '${zip}', ${year})
+        `
+    }
+    else {
+        sql = `
+            INSERT INTO 
+                Tournaments(TournamentName, Location, Address1, City, State, Zip, Year)
+            Values
+                ('${name}', '${location}', '${address1}', '${city}', '${state}}', '${zip}', ${year})
+        `
+    }
+
+    let result = run_sql(sql)
+
+    if (result.changes) {
+        return `Tournament ${name} successfully added`
+    }
+}
+
+/**
+ * checks if a tournament already is in the Tournaments table
+ * @param {*} name the name of the tournament
+ * @param {*} year the year for the tournament 
+ * @returns the result of the query 
+ */
+function check_if_tournament_exists(name, year) {
+    let sql = `
+        SELECT
+            *
+        FROM
+            Tournaments
+        WHERE 
+            TournamentName = '${name}' and Year = ${year}
+    `
+
+    return get_sql(sql)
+}
