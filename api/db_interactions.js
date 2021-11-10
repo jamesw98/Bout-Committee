@@ -20,6 +20,11 @@ function get_sql(sql) {
     return statement.get();    
 }
 
+function all_sql(sql) {
+    let statement = DB.prepare(sql);
+    return statement.all();
+}
+
 /**
  * add a fencer to the Fencers table with minimal information known about the fencer
  * @param {*} first_name the first name of the fencer
@@ -143,3 +148,38 @@ function check_if_tournament_exists(name, year) {
 
     return get_sql(sql)
 }
+
+function create_event(tournament_name, weapon, gender, classification) {
+
+}
+
+function check_if_event_in_tournament(classification, tournament_name, gender) {
+    let sql = `
+        SELECT 
+            pkTournament
+        FROM 
+            Tournaments
+        WHERE 
+            TournamentName = '${tournament_name}'
+    `
+    let result = get_sql(sql) 
+
+    if (!result) {
+        return `No tournament found by the name '${tournament_name}'`
+    }
+
+    sql = `
+        SELECT 
+            * 
+        FROM 
+            Events
+        WHERE
+            TournamentID = ${result.pkTournament} and
+            Classification = '${classification}' and
+            Gender = '${gender}'
+    `
+
+    return get_sql(sql)
+}
+
+check_if_event_in_tournament('asdf', 'May Melee', 'B')
